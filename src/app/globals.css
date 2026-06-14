@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-sans), sans-serif;
+  --font-body: var(--font-body), sans-serif;
+  --font-arabic: var(--font-arabic), sans-serif;
+}
+
+body {
+  font-family: var(--font-body), sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-sans), sans-serif;
+}
+
+.font-ar {
+  font-family: var(--font-arabic), sans-serif;
+}

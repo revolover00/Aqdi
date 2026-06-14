@@ -1,0 +1,6 @@
+{
+  "name": "Aqdi Freelance Contract Generator",
+  "description": "A privacy-first freelance contract generator that runs 100% in the browser offline.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
