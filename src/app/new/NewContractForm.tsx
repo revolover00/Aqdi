@@ -27,6 +27,15 @@ export default function NewContractForm() {
   const { currentStep, formData, errors, goNext, goPrev, updateField, submitContract, clearDraft } = useContractForm(typeParam);
   const { saveContract } = useContractStorage();
 
+  // Prefetch Arabic font to ensure immediate signature/generate PDF behavior
+  useEffect(() => {
+    import('../../lib/pdf/fontLoader')
+      .then(({ fetchArabicFont }) => {
+        fetchArabicFont().catch(() => {});
+      })
+      .catch(() => {});
+  }, []);
+
   const isAr = lang === 'ar';
   const text = UI_TEXT[lang];
 

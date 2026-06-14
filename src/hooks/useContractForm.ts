@@ -132,7 +132,19 @@ export function useContractForm(initialType?: ContractType) {
         });
       }
     } else if (step === 2) {
-      const scopeParse = scopeSchema.safeParse(formData.scope);
+      const rawDeliverables = formData.scope?.deliverables || [];
+      const trimmedAndCleaned = rawDeliverables
+        .map((d) => (typeof d === 'string' ? d.trim() : ''))
+        .filter((d) => d.length > 0);
+
+      const cleanedScope = {
+        title: formData.scope?.title || '',
+        description: formData.scope?.description || '',
+        revisions: formData.scope?.revisions ?? 3,
+        deliverables: trimmedAndCleaned.length > 0 ? trimmedAndCleaned : [''],
+      };
+
+      const scopeParse = scopeSchema.safeParse(cleanedScope);
       if (!scopeParse.success) {
         scopeParse.error.issues.forEach((issue) => {
           stepErrors[`scope.${issue.path.join('.')}`] = issue.message;
@@ -186,7 +198,18 @@ export function useContractForm(initialType?: ContractType) {
         return null;
       }
     }
-    return formData;
+    const finalDeliverables = (formData.scope?.deliverables || [])
+      .map((d) => (typeof d === 'string' ? d.trim() : ''))
+      .filter((d) => d.length > 0);
+    return {
+      ...formData,
+      scope: {
+        title: formData.scope?.title || '',
+        description: formData.scope?.description || '',
+        revisions: formData.scope?.revisions ?? 3,
+        deliverables: finalDeliverables.length > 0 ? finalDeliverables : [''],
+      },
+    };
   }, [formData, validateStep]);
 
   return {

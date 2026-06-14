@@ -1,15 +1,32 @@
+let cachedFont: ArrayBuffer | null = null;
+
 export async function fetchArabicFont(): Promise<ArrayBuffer> {
-  const fontUrl = 'https://fonts.gstatic.com/s/notosansarabic/v21/j8_2wXDCWAsEunFasOz3v9gNxaNK8tXfNfO1.ttf';
-  try {
-    const response = await fetch(fontUrl);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch Noto Sans Arabic font: ${response.statusText}`);
-    }
-    return await response.arrayBuffer();
-  } catch (error) {
-    console.error('[fontLoader] Error loading Arabic font, falling back to basic fetching...', error);
-    // Standard fetch fallback
-    const res = await fetch('https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-arabic/files/noto-sans-arabic-arabic-400-normal.woff');
-    return await res.arrayBuffer();
+  if (cachedFont) {
+    return cachedFont;
   }
+
+  const urls = [
+    'https://cdn.jsdelivr.net/npm/@notofonts/arabic@2.0.14/fonts/NotoSansArabic/unhinted/ttf/NotoSansArabic-Regular.ttf',
+    'https://fonts.gstatic.com/s/notosansarabic/v18/j8_2wXDCWAsEunFasOz3v9gNxaNK8tXfNfO1.ttf',
+    'https://fonts.gstatic.com/s/notosansarabic/v21/j8_2wXDCWAsEunFasOz3v9gNxaNK8tXfNfO1.ttf',
+    'https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/notosansarabic/static/NotoSansArabic-Regular.ttf',
+    'https://raw.githubusercontent.com/google/fonts/main/ofl/notosansarabic/static/NotoSansArabic-Regular.ttf'
+  ];
+
+  for (const url of urls) {
+    try {
+      const response = await fetch(url, { cache: 'force-cache' });
+      if (response.ok) {
+        const buffer = await response.arrayBuffer();
+        if (buffer && buffer.byteLength > 1000) {
+          cachedFont = buffer;
+          return buffer;
+        }
+      }
+    } catch (e) {
+      console.warn(`[fontLoader] Failed to fetch Arabic font from: ${url}`, e);
+    }
+  }
+
+  throw new Error('All Noto Sans Arabic standard TTF sources failed to load.');
 }

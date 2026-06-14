@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { PDFDocument, rgb } from 'pdf-lib';
+import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import { Contract } from '../types';
 import { fetchArabicFont } from '../lib/pdf/fontLoader';
 
@@ -31,9 +31,15 @@ export function usePDFGenerator() {
       const page = pdfDoc.addPage([595.28, 841.89]); // A4 Size
       const { width, height } = page.getSize();
       
-      // Load Arabic Font
-      const fontBytes = await fetchArabicFont();
-      const font = await pdfDoc.embedFont(fontBytes);
+      // Load Arabic Font with standard Helvetica fallback if all requests fail
+      let font;
+      try {
+        const fontBytes = await fetchArabicFont();
+        font = await pdfDoc.embedFont(fontBytes);
+      } catch (fontErr) {
+        console.error('[usePDFGenerator] Failed to load Noto Sans Arabic, falling back to Helvetica:', fontErr);
+        font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+      }
       
       const isAr = contract.language === 'ar';
       const textX = (str: string, size = 11, alignRight = isAr): number => {

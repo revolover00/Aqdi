@@ -44,7 +44,7 @@ export function StepTwo({ formData, errors, updateField, lang }: StepProps) {
 
         <div className="space-y-4">
           <div>
-            <label className={labelClass}>{isAr ? 'عنوان المشروع الرئيسي' : 'Project Title'}</label>
+            <label className={labelClass}>{isAr ? 'عنوان المشروع الرئيسي (حد أدنى ٥ أحرف)' : 'Project Title (min 5 chars)'}</label>
             <input
               type="text"
               className={inputClass}
@@ -52,7 +52,11 @@ export function StepTwo({ formData, errors, updateField, lang }: StepProps) {
               onChange={(e) => updateField(['scope', 'title'], e.target.value)}
               placeholder={isAr ? 'برمجة وتصميم متجر جوالات' : 'E-commerce App React'}
             />
-            {errors['scope.title'] && <p className="text-xs text-[#e94560] mt-1">{errors['scope.title']}</p>}
+            {errors['scope.title'] && (
+              <p className="text-xs text-[#e94560] mt-1">
+                {isAr ? 'عنوان المشروع قصير جداً (٥ أحرف على الأقل)' : errors['scope.title']}
+              </p>
+            )}
           </div>
 
           <div>
@@ -63,7 +67,11 @@ export function StepTwo({ formData, errors, updateField, lang }: StepProps) {
               onChange={(e) => updateField(['scope', 'description'], e.target.value)}
               placeholder={isAr ? 'توفير كود مصدري نظيف ومصمم خصيصاً للتطبيق لتسهيل تشغيل تجربة التسوق...' : 'Provide complete customized React frontend with shopping cart interface, state managers, and Stripe checkout page.'}
             />
-            {errors['scope.description'] && <p className="text-xs text-[#e94560] mt-1">{errors['scope.description']}</p>}
+            {errors['scope.description'] && (
+              <p className="text-xs text-[#e94560] mt-1">
+                {isAr ? 'الوصف قصير جداً (يجب أن يكون ٢٠ حرفاً على الأقل)' : errors['scope.description']}
+              </p>
+            )}
           </div>
 
           <div>
@@ -76,35 +84,51 @@ export function StepTwo({ formData, errors, updateField, lang }: StepProps) {
               value={s.revisions}
               onChange={(e) => updateField(['scope', 'revisions'], Number(e.target.value))}
             />
+            {errors['scope.revisions'] && (
+              <p className="text-xs text-[#e94560] mt-1">
+                {isAr ? 'عدد المراجعات يجب أن يكون بين ٠ و ١٠ مراجعات' : errors['scope.revisions']}
+              </p>
+            )}
           </div>
 
           <div>
-            <label className={`${labelClass} mb-2`}>{isAr ? 'بنود تسليمات المخرجات (التسليمات)' : 'Deliverables (Outcomes)'}</label>
-            <div className="space-y-2">
+            <label className={`${labelClass} mb-2`}>{isAr ? 'بنود تسليمات المخرجات (أضف بنداً واحداً على الأقل واكتب ٣ أحرف على الأقل لكل بند)' : 'Deliverables / Outcomes (min 3 chars per item)'}</label>
+            <div className="space-y-3">
               {dels.map((del, index) => (
-                <div key={index} className="flex gap-2">
-                  <input
-                    type="text"
-                    required
-                    className={`${inputClass} mt-0 flex-1`}
-                    value={del}
-                    onChange={(e) => onDelChange(index, e.target.value)}
-                    placeholder={isAr ? `مثال: ملفات التصميم الأساسية Fg` : `e.g. Figma Source Files`}
-                  />
-                  {dels.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeDeliverable(index)}
-                      className="p-3 bg-[#1a1a2e] hover:bg-[#e94560]/10 hover:text-[#e94560] border border-[#2a2a4a] text-gray-400 rounded-lg transition-all"
-                    >
-                      <Trash className="w-5 h-5" />
-                    </button>
+                <div key={index} className="space-y-1">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      required
+                      className={`${inputClass} mt-0 flex-1`}
+                      value={del}
+                      onChange={(e) => onDelChange(index, e.target.value)}
+                      placeholder={isAr ? `مثال: ملفات التصميم الأساسية Figma` : `e.g. Figma Source Files`}
+                    />
+                    {dels.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeDeliverable(index)}
+                        className="p-3 bg-[#1a1a2e] hover:bg-[#e94560]/10 hover:text-[#e94560] border border-[#2a2a4a] text-gray-400 rounded-lg transition-all"
+                      >
+                        <Trash className="w-5 h-5" />
+                      </button>
+                    )}
+                  </div>
+                  {errors[`scope.deliverables.${index}`] && (
+                    <p className="text-xs text-[#e94560] mt-1">
+                      {isAr ? 'يجب كتابة ٣ أحرف على الأقل لهذا البند' : errors[`scope.deliverables.${index}`]}
+                    </p>
                   )}
                 </div>
               ))}
             </div>
 
-            {errors['scope.deliverables'] && <p className="text-xs text-[#e94560] mt-1">{errors['scope.deliverables']}</p>}
+            {errors['scope.deliverables'] && (
+              <p className="text-xs text-[#e94560] mt-1">
+                {isAr ? 'يجب إضافة بند تسليم واحد على الأقل' : errors['scope.deliverables']}
+              </p>
+            )}
 
             <button
               type="button"

@@ -18,6 +18,15 @@ export default function LandingPage() {
   });
   const [selectedType, setSelectedType] = useState<ContractType>('web-development');
 
+  // Prefetch Arabic font in the background to speed up PDF generation later
+  useEffect(() => {
+    import('../lib/pdf/fontLoader')
+      .then(({ fetchArabicFont }) => {
+        fetchArabicFont().catch((err) => console.log('Prefetch font warning:', err));
+      })
+      .catch((err) => console.log('Dynamic import warning:', err));
+  }, []);
+
   const toggleLanguage = () => {
     const nextLang = lang === 'ar' ? 'en' : 'ar';
     setLang(nextLang);

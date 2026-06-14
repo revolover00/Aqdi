@@ -7,8 +7,9 @@ export function useDeadlineNotifier(contracts: Contract[]) {
   const [approachingContracts, setApproachingContracts] = useState<Contract[]>([]);
 
   const fireNotifications = (upcoming: Contract[]) => {
+    if (typeof window === 'undefined' || !('Notification' in window)) return;
     upcoming.forEach((c) => {
-      new Notification('عقدي | Aqdi Deadline Alert', {
+      new window.Notification('عقدي | Aqdi Deadline Alert', {
         body: `The deadline for contract "${c.scope.title}" is in less than 3 days!`,
         icon: '/favicon.ico',
       });

@@ -32,6 +32,15 @@ export default function PreviewShell() {
   const { parseFromUrl, generateLink } = useShareableLink();
   const { generatePDF, isGenerating } = usePDFGenerator();
 
+  // Warm up the font loader Cache
+  useEffect(() => {
+    import('../../lib/pdf/fontLoader')
+      .then(({ fetchArabicFont }) => {
+        fetchArabicFont().catch(() => {});
+      })
+      .catch(() => {});
+  }, []);
+
   const isAr = lang === 'ar';
   const text = UI_TEXT[lang];
 

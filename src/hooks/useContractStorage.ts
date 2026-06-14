@@ -4,23 +4,27 @@ import { useState, useEffect, useCallback } from 'react';
 import { Contract, ContractStatus } from '../types';
 
 export function useContractStorage() {
-  const [contracts, setContracts] = useState<Contract[]>(() => {
-    if (typeof window === 'undefined') return [];
+  const [contracts, setContracts] = useState<Contract[]>([]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
     try {
       const stored = localStorage.getItem('aqdi_contracts');
       if (stored) {
         const parsed = JSON.parse(stored) as Contract[];
         if (Array.isArray(parsed)) {
-          return parsed.sort(
+          const sorted = parsed.sort(
             (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
           );
+          setTimeout(() => {
+            setContracts(sorted);
+          }, 0);
         }
       }
     } catch (e) {
       console.error('[useContractStorage] Failed to parse contracts', e);
     }
-    return [];
-  });
+  }, []);
 
   const saveContractsState = useCallback((newContracts: Contract[]) => {
     // Sort and limit to 50
