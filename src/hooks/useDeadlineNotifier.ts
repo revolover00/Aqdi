@@ -6,6 +6,15 @@ import { Contract } from '../types';
 export function useDeadlineNotifier(contracts: Contract[]) {
   const [approachingContracts, setApproachingContracts] = useState<Contract[]>([]);
 
+  const fireNotifications = (upcoming: Contract[]) => {
+    upcoming.forEach((c) => {
+      new Notification('عقدي | Aqdi Deadline Alert', {
+        body: `The deadline for contract "${c.scope.title}" is in less than 3 days!`,
+        icon: '/favicon.ico',
+      });
+    });
+  };
+
   useEffect(() => {
     if (typeof window === 'undefined' || typeof sessionStorage === 'undefined') return;
 
@@ -39,31 +48,24 @@ export function useDeadlineNotifier(contracts: Contract[]) {
       return;
     }
 
-    setApproachingContracts(upcoming);
-    sessionStorage.setItem('aqdi_deadline_checked', 'true');
-
-    // Attempt browser Notification
-    if ('Notification' in window) {
-      if (Notification.permission === 'granted') {
-        fireNotifications(upcoming);
-      } else if (Notification.permission !== 'denied') {
-        Notification.requestPermission().then((permission) => {
-          if (permission === 'granted') {
-            fireNotifications(upcoming);
-          }
-        });
+    setTimeout(() => {
+      setApproachingContracts(upcoming);
+      // Attempt browser Notification
+      if ('Notification' in window) {
+        if (Notification.permission === 'granted') {
+          fireNotifications(upcoming);
+        } else if (Notification.permission !== 'denied') {
+          Notification.requestPermission().then((permission) => {
+            if (permission === 'granted') {
+              fireNotifications(upcoming);
+            }
+          });
+        }
       }
-    }
+    }, 0);
+    
+    sessionStorage.setItem('aqdi_deadline_checked', 'true');
   }, [contracts]);
-
-  const fireNotifications = (upcoming: Contract[]) => {
-    upcoming.forEach((c) => {
-      new Notification('عقدي | Aqdi Deadline Alert', {
-        body: `The deadline for contract "${c.scope.title}" is in less than 3 days!`,
-        icon: '/favicon.ico',
-      });
-    });
-  };
 
   return { approachingContracts };
 }

@@ -17,16 +17,15 @@ export default function NewContractForm() {
   const searchParams = useSearchParams();
   const typeParam = (searchParams.get('type') as ContractType) || 'web-development';
 
-  const [lang, setLang] = useState<'ar' | 'en'>('ar');
+  const [lang, setLang] = useState<'ar' | 'en'>(() => {
+    if (typeof window !== 'undefined') {
+      const s = localStorage.getItem('aqdi_lang') as 'ar' | 'en';
+      if (s === 'ar' || s === 'en') return s;
+    }
+    return 'ar';
+  });
   const { currentStep, formData, errors, goNext, goPrev, updateField, submitContract, clearDraft } = useContractForm(typeParam);
   const { saveContract } = useContractStorage();
-
-  // Pick up language
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const s = localStorage.getItem('aqdi_lang') as 'ar' | 'en';
-    if (s === 'ar' || s === 'en') setLang(s);
-  }, []);
 
   const isAr = lang === 'ar';
   const text = UI_TEXT[lang];

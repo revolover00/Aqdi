@@ -10,17 +10,17 @@ import { Briefcase, Plus, AlertCircle, Home } from 'lucide-react';
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [lang, setLang] = useState<'ar' | 'en'>('ar');
+  const [lang, setLang] = useState<'ar' | 'en'>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('aqdi_lang') as 'ar' | 'en';
+      if (saved === 'ar' || saved === 'en') return saved;
+    }
+    return 'ar';
+  });
   const { contracts, deleteContract } = useContractStorage();
 
   // Deadline notifications within 3 days
   const { approachingContracts } = useDeadlineNotifier(contracts);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const saved = localStorage.getItem('aqdi_lang') as 'ar' | 'en';
-    if (saved === 'ar' || saved === 'en') setLang(saved);
-  }, []);
 
   const isAr = lang === 'ar';
   const text = UI_TEXT[lang];

@@ -15,7 +15,7 @@ export const scopeSchema = z.object({
 });
 
 export const pricingSchema = z.object({
-  amount: z.number({ invalid_type_error: 'Amount must be a number' }).positive('Amount must be positive'),
+  amount: z.number().positive('Amount must be positive'),
   currency: z.enum(['USD', 'EGP', 'SAR', 'AED']),
   paymentTerms: z.enum(['full-upfront', '50-50', '30-70', 'milestone-based', 'upon-delivery']),
   latePenaltyPercent: z.number().min(0).max(10),

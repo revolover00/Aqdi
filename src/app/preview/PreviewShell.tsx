@@ -17,7 +17,13 @@ export default function PreviewShell() {
   const id = searchParams.get('id');
   const cParam = searchParams.get('c');
 
-  const [lang, setLang] = useState<'ar' | 'en'>('ar');
+  const [lang, setLang] = useState<'ar' | 'en'>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('aqdi_lang') as 'ar' | 'en';
+      if (saved === 'ar' || saved === 'en') return saved;
+    }
+    return 'ar';
+  });
   const [contract, setContract] = useState<Contract | null>(null);
   const [copied, setCopied] = useState(false);
   const [signingActive, setSigningActive] = useState(false);
@@ -26,38 +32,35 @@ export default function PreviewShell() {
   const { parseFromUrl, generateLink } = useShareableLink();
   const { generatePDF, isGenerating } = usePDFGenerator();
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const saved = localStorage.getItem('aqdi_lang') as 'ar' | 'en';
-    if (saved === 'ar' || saved === 'en') setLang(saved);
-  }, []);
-
   const isAr = lang === 'ar';
   const text = UI_TEXT[lang];
 
   // Resolve contract from URL or localStorage
   useEffect(() => {
-    if (cParam) {
-      const decoded = parseFromUrl();
-      if (decoded) {
-        setContract(decoded);
-        return;
+    const resolve = () => {
+      if (cParam) {
+        const decoded = parseFromUrl();
+        if (decoded) {
+          setContract(decoded);
+          return;
+        }
       }
-    }
-    if (id) {
-      const saved = getContract(id);
-      if (saved) {
-        setContract(saved);
-        return;
+      if (id) {
+        const saved = getContract(id);
+        if (saved) {
+          setContract(saved);
+          return;
+        }
       }
-    }
+    };
+    setTimeout(resolve, 0);
   }, [id, cParam, getContract, parseFromUrl]);
 
   const handleDownload = async () => {
     if (!contract) return;
     try {
       const bytes = await generatePDF(contract);
-      const blob = new Blob([bytes], { type: 'application/pdf' });
+      const blob = new Blob([bytes as any], { type: 'application/pdf' });
       const dlLink = document.createElement('a');
       dlLink.href = URL.createObjectURL(blob);
       dlLink.download = `${contract.scope.title || 'contract'}.pdf`;

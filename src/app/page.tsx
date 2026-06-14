@@ -9,17 +9,14 @@ import { Briefcase, FolderKanban } from 'lucide-react';
 
 export default function LandingPage() {
   const router = useRouter();
-  const [lang, setLang] = useState<'ar' | 'en'>('ar');
-  const [selectedType, setSelectedType] = useState<ContractType>('web-development');
-
-  // Load language preference from localStorage
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const saved = localStorage.getItem('aqdi_lang') as 'ar' | 'en';
-    if (saved === 'ar' || saved === 'en') {
-      setLang(saved);
+  const [lang, setLang] = useState<'ar' | 'en'>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('aqdi_lang') as 'ar' | 'en';
+      if (saved === 'ar' || saved === 'en') return saved;
     }
-  }, []);
+    return 'ar';
+  });
+  const [selectedType, setSelectedType] = useState<ContractType>('web-development');
 
   const toggleLanguage = () => {
     const nextLang = lang === 'ar' ? 'en' : 'ar';
