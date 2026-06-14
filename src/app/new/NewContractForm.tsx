@@ -35,7 +35,10 @@ export default function NewContractForm() {
     if (!finalForm) return;
 
     try {
-      const generatedId = crypto.randomUUID();
+      const gId = (typeof crypto !== 'undefined' && crypto.randomUUID) 
+        ? crypto.randomUUID() 
+        : (Math.random().toString(36).substring(2, 11) + '-' + Math.random().toString(36).substring(2, 11));
+      const generatedId = gId;
       const newContract: Contract = {
         id: generatedId,
         type: typeParam,

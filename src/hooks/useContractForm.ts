@@ -16,6 +16,7 @@ type FormAction =
   | { type: 'SET_ERRORS'; errors: Record<string, string> }
   | { type: 'GO_NEXT' }
   | { type: 'GO_PREV' }
+  | { type: 'SET_STEP'; step: number }
   | { type: 'CLEAR_DRAFT'; payload: ContractDraft };
 
 const initialDraft = (type?: ContractType): ContractDraft => ({
@@ -61,6 +62,8 @@ function formReducer(state: FormState, action: FormAction): FormState {
       return { ...state, currentStep: Math.min(state.currentStep + 1, 4), errors: {} };
     case 'GO_PREV':
       return { ...state, currentStep: Math.max(state.currentStep - 1, 1), errors: {} };
+    case 'SET_STEP':
+      return { ...state, currentStep: action.step, errors: {} };
     case 'CLEAR_DRAFT':
       return {
         currentStep: 1,
@@ -177,8 +180,11 @@ export function useContractForm(initialType?: ContractType) {
   }, [initialType]);
 
   const submitContract = useCallback((): any | null => {
-    if (!validateStep(1) || !validateStep(2) || !validateStep(3) || !validateStep(4)) {
-      return null;
+    for (const step of [1, 2, 3, 4]) {
+      if (!validateStep(step)) {
+        dispatch({ type: 'SET_STEP', step });
+        return null;
+      }
     }
     return formData;
   }, [formData, validateStep]);
